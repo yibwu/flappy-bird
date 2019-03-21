@@ -1,0 +1,105 @@
+<html>
+  <head></head>
+  <body onload="draw();">
+    <canvas id="tutorial" width="400" height="600" style='border: 1px solid black;'></canvas>
+  </body>
+  <script type="text/javascript">
+    var canvas = document.getElementById("tutorial")
+    var ctx = canvas.getContext("2d")
+    var angle = 45 
+    var canvasWidth = 400 
+    var canvasHeight = 600 
+    var birdWidth = 40
+    var birdHeight = 40
+    var step = 30 
+    var x = canvasWidth / 2 - birdWidth / 2 
+    var y = canvasHeight / 2 - birdHeight / 2
+    var img = new Image()
+    img.onload = function () {
+      ctx.drawImage(img, x, y, birdWidth, birdHeight)
+    }
+    img.src = 'bird.jpeg'
+
+    function draw() {
+      window.addEventListener('keydown', pressKeyHandler, false)
+    }
+    
+    function moveUp() {
+      if (y >= 5) {
+        y -= 45 
+      }
+      angle = 0
+    }
+
+    function moveDown() {
+      if (y <= canvasHeight - birdHeight) {
+        y += step 
+        angle += 5
+      }
+    }
+
+    function moveLeft() {
+      if (x >= 5) {
+        x -= step
+      }
+    }
+
+    function moveRight() {
+      if (x <= canvasWidth - birdWidth) {
+        x += step 
+        angle -= 5
+        if (angle <= 0) {
+          angle = 0 
+        }
+      }
+    }
+
+    function pressKeyHandler(event) {
+      switch(event.keyCode) {
+        case 32:
+          moveUp()
+          reDraw()
+          break
+        case 40:
+          moveDown()
+          reDraw()
+          break
+        case 37:
+          moveLeft()
+          reDraw()
+          break
+        case 39:
+          moveRight()
+          reDraw()
+          break
+      }
+    }
+    
+    function reDraw() {
+      this.ctx.clearRect(0, 0, canvas.width, canvas.height)
+      this.ctx.translate(x + 20, y + 20)
+      this.ctx.rotate(angle * Math.PI / 180)
+      this.ctx.translate(-x - 20, -y - 20)
+      this.ctx.drawImage(img, x, y, birdWidth, birdHeight)
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0)
+    } 
+
+    var nIntervId
+    function changeColor() {
+      nIntervId = setInterval(flashText, 500);
+    }
+    function flashText() {
+      y += 30 
+      angle += 15 
+      if (angle >= 90) {
+        angle = 90
+      }  
+      if (y >= canvasHeight - birdHeight) {
+        clearInterval(nIntervId)
+      } else {
+        reDraw()
+      }
+    }
+    changeColor()
+  </script>  
+</html>
