@@ -31,45 +31,11 @@
       }
     }
 
-    function moveDown() {
-      if (y <= canvasHeight - birdHeight) {
-        y += step 
-        angle += 5
-      }
-    }
-
-    function moveLeft() {
-      if (x >= 5) {
-        x -= step
-      }
-    }
-
-    function moveRight() {
-      if (x <= canvasWidth - birdWidth) {
-        x += step 
-        angle -= 5
-        if (angle <= 0) {
-          angle = 0 
-        }
-      }
-    }
-
     function pressKeyHandler(event) {
       switch(event.keyCode) {
+        // press Space
         case 32:
           moveUp()
-          reDraw()
-          break
-        case 40:
-          moveDown()
-          reDraw()
-          break
-        case 37:
-          moveLeft()
-          reDraw()
-          break
-        case 39:
-          moveRight()
           reDraw()
           break
       }
