@@ -6,7 +6,7 @@
   <script type="text/javascript">
     var canvas = document.getElementById("tutorial")
     var ctx = canvas.getContext("2d")
-    var angle = 45 
+    var angle = 0  // bird rotate angle 
     var canvasWidth = 400 
     var canvasHeight = 600 
     var birdWidth = 40
@@ -26,9 +26,9 @@
     
     function moveUp() {
       if (y >= 5) {
-        y -= 45 
+        y -= 60 
+        angle = 0
       }
-      angle = 0
     }
 
     function moveDown() {
@@ -85,11 +85,11 @@
     } 
 
     var nIntervId
-    function changeColor() {
-      nIntervId = setInterval(flashText, 500);
+    function birdFallBegin() {
+      nIntervId = setInterval(birdFall, 500);
     }
-    function flashText() {
-      y += 30 
+    function birdFall() {
+      y += 45 
       angle += 15 
       if (angle >= 90) {
         angle = 90
@@ -100,6 +100,6 @@
         reDraw()
       }
     }
-    changeColor()
+    birdFallBegin()
   </script>  
 </html>
