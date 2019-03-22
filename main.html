@@ -1,7 +1,9 @@
 <html>
-  <head></head>
+  <head>
+    <link rel="icon" href="bird.png">
+  </head>
   <body onload="draw();">
-    <canvas id="tutorial" width="400" height="600" style='border: 1px solid black;'></canvas>
+    <canvas id="tutorial" width="400" height="600" style="border: 1px solid black;"></canvas>
   </body>
   <script type="text/javascript">
     var canvas = document.getElementById("tutorial")
@@ -13,11 +15,18 @@
     var x = CANVAS_WIDTH / 2 - BIRD_WIDTH / 2 
     var y = CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2
     var angle = 0  // bird rotate angle 
-    var img = new Image()
-    img.onload = function () {
-      ctx.drawImage(img, x, y, BIRD_WIDTH, BIRD_HEIGHT)
+    
+    var background = new Image()
+    background.onload = function () {
+      ctx.drawImage(background, x, y, CANVAS_WIDTH, CANVAS_HEIGHT)
     }
-    img.src = 'bird.jpeg'
+    background.src = 'background.png'
+
+    var bird = new Image()
+    bird.onload = function () {
+      ctx.drawImage(bird, x, y, BIRD_WIDTH, BIRD_HEIGHT)
+    }
+    bird.src = 'bird.png'
 
     function draw() {
       window.addEventListener('keydown', pressKeyHandler, false)
@@ -42,10 +51,11 @@
     
     function reDraw() {
       this.ctx.clearRect(0, 0, canvas.width, canvas.height)
+      this.ctx.drawImage(background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       this.ctx.translate(x + BIRD_WIDTH / 2, y + BIRD_HEIGHT / 2)
       this.ctx.rotate(angle * Math.PI / 180)
       this.ctx.translate(-x - BIRD_WIDTH / 2, -y - BIRD_HEIGHT / 2)
-      this.ctx.drawImage(img, x, y, BIRD_WIDTH, BIRD_HEIGHT)
+      this.ctx.drawImage(bird, x, y, BIRD_WIDTH, BIRD_HEIGHT)
       this.ctx.setTransform(1, 0, 0, 1, 0, 0)
     } 
 
@@ -56,7 +66,7 @@
 
     function birdFall() {
       y += 10 
-      angle += 3 
+      angle += 4 
       if (angle >= 90) {
         angle = 90
       }  
