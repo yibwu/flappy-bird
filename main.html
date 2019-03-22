@@ -3,39 +3,36 @@
     <link rel="icon" href="bird.png">
   </head>
   <body onload="draw();">
-    <canvas id="tutorial" width="400" height="600" style="border: 1px solid black;"></canvas>
+    <canvas id="tutorial" width="480" height="640" style="border: 1px solid black;"></canvas>
   </body>
+
   <script type="text/javascript">
     var canvas = document.getElementById("tutorial")
     var ctx = canvas.getContext("2d")
-    var CANVAS_WIDTH = 400 
-    var CANVAS_HEIGHT = 600 
+    var CANVAS_WIDTH = canvas.width 
+    var CANVAS_HEIGHT = canvas.height 
+    var GROUND_WIDTH = 37
+    var GROUND_HEIGHT = 128 
     var BIRD_WIDTH = 40
     var BIRD_HEIGHT = 40
-    var x = CANVAS_WIDTH / 2 - BIRD_WIDTH / 2 
+    var PIPE_WIDTH = 65
+    var PIPE_HEIGHT = 200  
+    var x = CANVAS_WIDTH / 2 - BIRD_WIDTH 
     var y = CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2
-    var angle = 0  // bird rotate angle 
-    
-    var background = new Image()
-    background.onload = function () {
-      ctx.drawImage(background, x, y, CANVAS_WIDTH, CANVAS_HEIGHT)
-    }
-    background.src = 'background.png'
-
-    var bird = new Image()
-    bird.onload = function () {
-      ctx.drawImage(bird, x, y, BIRD_WIDTH, BIRD_HEIGHT)
-    }
-    bird.src = 'bird.png'
+    var rotateAngle = 0 
+    var count = 0
+    var background = loadImage('background.png')
+    var ground = loadImage('ground.png')
+    var bird = loadImage('bird.png')
 
     function draw() {
       window.addEventListener('keydown', pressKeyHandler, false)
     }
     
-    function moveUp() {
+    function pressUp() {
       if (y >= 5) {
-        y -= 60 
-        angle = -20
+        y -= 80 
+        rotateAngle = -20
       }
     }
 
@@ -43,21 +40,39 @@
       switch(event.keyCode) {
         // press Space
         case 32:
-          moveUp()
+          pressUp()
           reDraw()
           break
       }
     }
     
     function reDraw() {
-      this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-      this.ctx.drawImage(background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      this.ctx.drawImage(background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_HEIGHT)
+      this.drawGround()
       this.ctx.translate(x + BIRD_WIDTH / 2, y + BIRD_HEIGHT / 2)
-      this.ctx.rotate(angle * Math.PI / 180)
+      this.ctx.rotate(rotateAngle * Math.PI / 180)
       this.ctx.translate(-x - BIRD_WIDTH / 2, -y - BIRD_HEIGHT / 2)
       this.ctx.drawImage(bird, x, y, BIRD_WIDTH, BIRD_HEIGHT)
       this.ctx.setTransform(1, 0, 0, 1, 0, 0)
     } 
+
+    function loadImage(filePath) {
+      var img = new Image()
+      img.src = filePath 
+      return img 
+    }
+
+    function drawGround() {
+      var offset = -count * 10 
+      for (let i = 0; i < 14; i++) {
+        this.ctx.drawImage(ground, 0 + i * GROUND_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT, GROUND_WIDTH, GROUND_HEIGHT)
+      }
+      count += 1
+      if (count >= 4) {
+        count = 0
+      }
+    }
 
     var nIntervId = null
     function birdFallBegin() {
@@ -65,12 +80,12 @@
     }
 
     function birdFall() {
-      y += 10 
-      angle += 4 
-      if (angle >= 90) {
-        angle = 90
+      y += 20 
+      rotateAngle += 8 
+      if (rotateAngle >= 90) {
+        rotateAngle = 90
       }  
-      if (y >= CANVAS_HEIGHT - BIRD_HEIGHT) {
+      if (y >= CANVAS_HEIGHT - GROUND_HEIGHT - BIRD_HEIGHT / 2) {
         clearInterval(nIntervId)
       } else {
         reDraw()
