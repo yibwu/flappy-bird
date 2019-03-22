@@ -6,17 +6,16 @@
   <script type="text/javascript">
     var canvas = document.getElementById("tutorial")
     var ctx = canvas.getContext("2d")
+    var CANVAS_WIDTH = 400 
+    var CANVAS_HEIGHT = 600 
+    var BIRD_WIDTH = 40
+    var BIRD_HEIGHT = 40
+    var x = CANVAS_WIDTH / 2 - BIRD_WIDTH / 2 
+    var y = CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2
     var angle = 0  // bird rotate angle 
-    var canvasWidth = 400 
-    var canvasHeight = 600 
-    var birdWidth = 40
-    var birdHeight = 40
-    var step = 30 
-    var x = canvasWidth / 2 - birdWidth / 2 
-    var y = canvasHeight / 2 - birdHeight / 2
     var img = new Image()
     img.onload = function () {
-      ctx.drawImage(img, x, y, birdWidth, birdHeight)
+      ctx.drawImage(img, x, y, BIRD_WIDTH, BIRD_HEIGHT)
     }
     img.src = 'bird.jpeg'
 
@@ -27,7 +26,7 @@
     function moveUp() {
       if (y >= 5) {
         y -= 60 
-        angle = 0
+        angle = -20
       }
     }
 
@@ -43,29 +42,31 @@
     
     function reDraw() {
       this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-      this.ctx.translate(x + 20, y + 20)
+      this.ctx.translate(x + BIRD_WIDTH / 2, y + BIRD_HEIGHT / 2)
       this.ctx.rotate(angle * Math.PI / 180)
-      this.ctx.translate(-x - 20, -y - 20)
-      this.ctx.drawImage(img, x, y, birdWidth, birdHeight)
+      this.ctx.translate(-x - BIRD_WIDTH / 2, -y - BIRD_HEIGHT / 2)
+      this.ctx.drawImage(img, x, y, BIRD_WIDTH, BIRD_HEIGHT)
       this.ctx.setTransform(1, 0, 0, 1, 0, 0)
     } 
 
-    var nIntervId
+    var nIntervId = null
     function birdFallBegin() {
-      nIntervId = setInterval(birdFall, 500);
+      nIntervId = setInterval(birdFall, 100);
     }
+
     function birdFall() {
-      y += 45 
-      angle += 15 
+      y += 10 
+      angle += 3 
       if (angle >= 90) {
         angle = 90
       }  
-      if (y >= canvasHeight - birdHeight) {
+      if (y >= CANVAS_HEIGHT - BIRD_HEIGHT) {
         clearInterval(nIntervId)
       } else {
         reDraw()
       }
     }
+
     birdFallBegin()
   </script>  
 </html>
