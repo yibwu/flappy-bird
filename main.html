@@ -24,7 +24,7 @@
     var ctx = canvas.getContext("2d")
     var CANVAS_WIDTH = canvas.width 
     var CANVAS_HEIGHT = canvas.height 
-    var GROUND_WIDTH = 37
+    var GROUND_WIDTH = 40 
     var GROUND_HEIGHT = 128 
     var BIRD_WIDTH = 50
     var BIRD_HEIGHT = 50
@@ -78,7 +78,7 @@
 
     function drawGround() {
       var offset = -count * 10 
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < 15; i++) {
         this.ctx.drawImage(ground, i * GROUND_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT, GROUND_WIDTH, GROUND_HEIGHT)
       }
       count += 1
@@ -90,20 +90,30 @@
     function drawPipes() {
       var offset = -countPipe * 5 
       for (let i = 0; i < 8; i += 2) {
-        this.ctx.drawImage(pipes[i].pipe, (1.7 *i) * PIPE_WIDTH + offset, 0, PIPE_WIDTH, PIPE_HEIGHT - pipes[i].offset)
-        this.ctx.drawImage(pipes[i+1].pipe, (1.7 *i) * PIPE_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT - PIPE_HEIGHT + pipes[i+1].offset, PIPE_WIDTH, PIPE_HEIGHT - pipes[i+1].offset)
+        this.ctx.drawImage(pipes[i].pipe, (1.7 * i) * PIPE_WIDTH + offset, 0, PIPE_WIDTH, PIPE_HEIGHT - pipes[i].offset)
+        this.ctx.drawImage(pipes[i+1].pipe, (1.7 * i) * PIPE_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT - PIPE_HEIGHT + pipes[i+1].offset, PIPE_WIDTH, PIPE_HEIGHT - pipes[i+1].offset)
       }
       countPipe += 1 
-      if (countPipe >= 60) {
+      if (countPipe >= 55) {
+        updatePipes()
         countPipe = 0
       }
+    }
+
+    function updatePipes() {
+        this.pipes.shift()
+        this.pipes.shift()
+        let offset = getRandomInt(20, 100)
+        var p1 = new Pipe(0, 0, offset, true)
+        var p2 = new Pipe(0, 0, -offset, false)
+        this.pipes.push(p1)
+        this.pipes.push(p2)
     }
 
     function getPipes() {
       var pipes = []
       for (let i = 0; i < 4; i++) {
         let offset = getRandomInt(20, 100)
-        console.log('offset', offset)
         var p1 = new Pipe(0, 0, offset, true)
         var p2 = new Pipe(0, 0, -offset, false)
         pipes.push(p1)
