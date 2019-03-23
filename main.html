@@ -7,23 +7,38 @@
   </body>
 
   <script type="text/javascript">
+    class Pipe {
+      constructor(x, y, offset, isFlip) {
+        this.x = x
+        this.y = y
+        this.offset = offset
+        this.isFlip = isFlip
+        if (this.isFlip) {
+          this.pipe = loadImage('pipe_flip.png')
+        } else {
+          this.pipe = loadImage('pipe.png')
+        }
+      }
+    }
     var canvas = document.getElementById("tutorial")
     var ctx = canvas.getContext("2d")
     var CANVAS_WIDTH = canvas.width 
     var CANVAS_HEIGHT = canvas.height 
     var GROUND_WIDTH = 37
     var GROUND_HEIGHT = 128 
-    var BIRD_WIDTH = 40
-    var BIRD_HEIGHT = 40
-    var PIPE_WIDTH = 65
-    var PIPE_HEIGHT = 200  
+    var BIRD_WIDTH = 50
+    var BIRD_HEIGHT = 50
+    var PIPE_WIDTH = 80 
+    var PIPE_HEIGHT = 178  
     var x = CANVAS_WIDTH / 2 - BIRD_WIDTH 
     var y = CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2
     var rotateAngle = 0 
-    var count = 0
+    var count = 0  // for ground
+    var countPipe = 0
     var background = loadImage('background.png')
     var ground = loadImage('ground.png')
     var bird = loadImage('bird.png')
+    var pipes = getPipes() 
 
     function draw() {
       window.addEventListener('keydown', pressKeyHandler, false)
@@ -37,12 +52,9 @@
     }
 
     function pressKeyHandler(event) {
-      switch(event.keyCode) {
-        // press Space
-        case 32:
-          pressUp()
-          reDraw()
-          break
+      if (event.keyCode == 32) {
+        pressUp()
+        reDraw()
       }
     }
     
@@ -50,6 +62,7 @@
       this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       this.ctx.drawImage(background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_HEIGHT)
       this.drawGround()
+      this.drawPipes()
       this.ctx.translate(x + BIRD_WIDTH / 2, y + BIRD_HEIGHT / 2)
       this.ctx.rotate(rotateAngle * Math.PI / 180)
       this.ctx.translate(-x - BIRD_WIDTH / 2, -y - BIRD_HEIGHT / 2)
@@ -66,12 +79,41 @@
     function drawGround() {
       var offset = -count * 10 
       for (let i = 0; i < 14; i++) {
-        this.ctx.drawImage(ground, 0 + i * GROUND_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT, GROUND_WIDTH, GROUND_HEIGHT)
+        this.ctx.drawImage(ground, i * GROUND_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT, GROUND_WIDTH, GROUND_HEIGHT)
       }
       count += 1
       if (count >= 4) {
         count = 0
       }
+    }
+
+    function drawPipes() {
+      var offset = -countPipe * 5 
+      for (let i = 0; i < 8; i += 2) {
+        this.ctx.drawImage(pipes[i].pipe, (1.7 *i) * PIPE_WIDTH + offset, 0, PIPE_WIDTH, PIPE_HEIGHT - pipes[i].offset)
+        this.ctx.drawImage(pipes[i+1].pipe, (1.7 *i) * PIPE_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT - PIPE_HEIGHT + pipes[i+1].offset, PIPE_WIDTH, PIPE_HEIGHT - pipes[i+1].offset)
+      }
+      countPipe += 1 
+      if (countPipe >= 60) {
+        countPipe = 0
+      }
+    }
+
+    function getPipes() {
+      var pipes = []
+      for (let i = 0; i < 4; i++) {
+        let offset = getRandomInt(20, 100)
+        console.log('offset', offset)
+        var p1 = new Pipe(0, 0, offset, true)
+        var p2 = new Pipe(0, 0, -offset, false)
+        pipes.push(p1)
+        pipes.push(p2)
+      }
+      return pipes
+    }
+
+    function getRandomInt(min, max) {
+      return min + Math.floor(Math.random() * Math.floor(max - min))
     }
 
     var nIntervId = null
