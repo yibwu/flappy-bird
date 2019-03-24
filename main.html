@@ -33,7 +33,7 @@
     var x = CANVAS_WIDTH / 2 - BIRD_WIDTH 
     var y = CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2
     var rotateAngle = 0 
-    var count = 0  // for ground
+    var count = 0
     var countPipe = 0
     var background = loadImage('background.png')
     var ground = loadImage('ground.png')
@@ -88,32 +88,36 @@
     }
 
     function drawPipes() {
-      var offset = -countPipe * 5 
-      for (let i = 0; i < 8; i += 2) {
+      var offset = -countPipe * 8 
+      for (let i = 0; i < 6; i += 2) {
         this.ctx.drawImage(pipes[i].pipe, (1.7 * i) * PIPE_WIDTH + offset, 0, PIPE_WIDTH, PIPE_HEIGHT - pipes[i].offset)
         this.ctx.drawImage(pipes[i+1].pipe, (1.7 * i) * PIPE_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT - PIPE_HEIGHT + pipes[i+1].offset, PIPE_WIDTH, PIPE_HEIGHT - pipes[i+1].offset)
       }
       countPipe += 1 
-      if (countPipe >= 55) {
+      if (countPipe >= 34) {
         updatePipes()
         countPipe = 0
       }
     }
 
     function updatePipes() {
-        this.pipes.shift()
-        this.pipes.shift()
-        let offset = getRandomInt(20, 100)
-        var p1 = new Pipe(0, 0, offset, true)
-        var p2 = new Pipe(0, 0, -offset, false)
-        this.pipes.push(p1)
-        this.pipes.push(p2)
+      this.pipes.shift()
+      this.pipes.shift()
+      let offset = getRandomInt(20, 120)
+      let isFlip = Math.random() - 0.5 > 0 ? 1 : -1 
+      offset *= isFlip
+      var p1 = new Pipe(0, 0, offset, true)  // generate new pipes
+      var p2 = new Pipe(0, 0, -offset, false)
+      this.pipes.push(p1)
+      this.pipes.push(p2)
     }
 
     function getPipes() {
       var pipes = []
-      for (let i = 0; i < 4; i++) {
-        let offset = getRandomInt(20, 100)
+      for (let i = 0; i < 3; i++) {
+        let offset = getRandomInt(20, 120)
+        let isFlip = Math.random() - 0.5 > 0 ? 1 : -1 
+        offset *= isFlip
         var p1 = new Pipe(0, 0, offset, true)
         var p2 = new Pipe(0, 0, -offset, false)
         pipes.push(p1)
