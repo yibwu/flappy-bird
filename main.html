@@ -8,9 +8,11 @@
 
   <script type="text/javascript">
     class Pipe {
-      constructor(x, y, offset, isFlip) {
+      constructor(x, y, width, height, offset, isFlip) {
         this.x = x
         this.y = y
+        this.width = width
+        this.height = height 
         this.offset = offset
         this.isFlip = isFlip
         if (this.isFlip) {
@@ -67,6 +69,9 @@
       this.ctx.rotate(rotateAngle * Math.PI / 180)
       this.ctx.translate(-x - BIRD_WIDTH / 2, -y - BIRD_HEIGHT / 2)
       this.ctx.drawImage(bird, x, y, BIRD_WIDTH, BIRD_HEIGHT)
+      if (isCollision()) {
+        clearInterval(nIntervId) 
+      }
       this.ctx.setTransform(1, 0, 0, 1, 0, 0)
     } 
 
@@ -90,8 +95,15 @@
     function drawPipes() {
       var offset = -countPipe * 8 
       for (let i = 0; i < 6; i += 2) {
-        this.ctx.drawImage(pipes[i].pipe, (1.7 * i) * PIPE_WIDTH + offset, 0, PIPE_WIDTH, PIPE_HEIGHT - pipes[i].offset)
-        this.ctx.drawImage(pipes[i+1].pipe, (1.7 * i) * PIPE_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT - PIPE_HEIGHT + pipes[i+1].offset, PIPE_WIDTH, PIPE_HEIGHT - pipes[i+1].offset)
+        let tx = (1.7 * i) * PIPE_WIDTH + offset
+        pipes[i].x = tx
+        pipes[i].y = 0
+        pipes[i].height = PIPE_HEIGHT - pipes[i].offset
+        pipes[i+1].x = tx
+        pipes[i+1].y = CANVAS_HEIGHT - GROUND_HEIGHT - PIPE_HEIGHT + pipes[i+1].offset
+        pipes[i+1].height = PIPE_HEIGHT - pipes[i+1].offset
+        this.ctx.drawImage(pipes[i].pipe, pipes[i].x, pipes[i].y, pipes[i].width, pipes[i].height)
+        this.ctx.drawImage(pipes[i+1].pipe, pipes[i+1].x, pipes[i+1].y, pipes[i+1].width, pipes[i+1].height)
       }
       countPipe += 1 
       if (countPipe >= 34) {
@@ -106,8 +118,8 @@
       let offset = getRandomInt(20, 120)
       let isFlip = Math.random() - 0.5 > 0 ? 1 : -1 
       offset *= isFlip
-      var p1 = new Pipe(0, 0, offset, true)  // generate new pipes
-      var p2 = new Pipe(0, 0, -offset, false)
+      var p1 = new Pipe(0, 0, PIPE_WIDTH, 0, offset, true)  // generate new pipes
+      var p2 = new Pipe(0, 0, PIPE_WIDTH, 0, -offset, false)
       this.pipes.push(p1)
       this.pipes.push(p2)
     }
@@ -118,12 +130,28 @@
         let offset = getRandomInt(20, 120)
         let isFlip = Math.random() - 0.5 > 0 ? 1 : -1 
         offset *= isFlip
-        var p1 = new Pipe(0, 0, offset, true)
-        var p2 = new Pipe(0, 0, -offset, false)
+        var p1 = new Pipe(0, 0, PIPE_WIDTH, 0, offset, true)
+        var p2 = new Pipe(0, 0, PIPE_WIDTH, 0, -offset, false)
         pipes.push(p1)
         pipes.push(p2)
       }
       return pipes
+    }
+
+    function isCollision() {
+      for (let i = 0; i < 6; i++) {
+        let dx = pipes[i].x
+        let dy = pipes[i].y
+        let height = pipes[i].height
+        
+        if (dx < x + BIRD_WIDTH &&
+            dx + PIPE_WIDTH > x &&
+            dy < y + BIRD_HEIGHT &&
+            height + dy > y) {
+          return true
+        }
+      }
+      return false 
     }
 
     function getRandomInt(min, max) {
