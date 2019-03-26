@@ -17,6 +17,13 @@
       return min + Math.floor(Math.random() * Math.floor(max - min))
     }
 
+    function getRandomOffset() {
+      let offset = getRandomInt(20, 120)
+      let isFlip = Math.random() > 0.5 ? 1 : -1
+      offset *= isFlip
+      return offset 
+    }
+
     class Base {
       constructor(x, y, width, height, filePath) {
         this.x = x
@@ -135,9 +142,7 @@
     function updatePipes() {
       let p1 = this.pipes.shift()
       let p2 = this.pipes.shift()
-      let offset = getRandomInt(20, 120)
-      let isFlip = Math.random() > 0.5 ? 1 : -1
-      offset *= isFlip
+      let offset = getRandomOffset()
       p1.offset = offset
       p2.offset = -offset
       p1.x = this.pipes[2].x + 3.4 * PIPE_WIDTH
@@ -150,9 +155,7 @@
       let pipes = []
       let X_OFFSET = CANVAS_WIDTH * 1.5
       for (let i = 0; i < 3; i++) {
-        let offset = getRandomInt(20, 120)
-        let isFlip = Math.random() > 0.5 ? 1 : -1
-        offset *= isFlip
+        let offset = getRandomOffset() 
         let p1 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'pipe_flip.png', offset)
         let p2 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'pipe.png', -offset)
         pipes.push(p1)
