@@ -8,7 +8,7 @@
 
   <script type="text/javascript">
     function loadImage(filePath) {
-      var img = new Image()
+      let img = new Image()
       img.src = filePath
       return img
     }
@@ -28,9 +28,10 @@
     }
 
     class Bird extends Base {
-      constructor(x, y, width, height, filePath, isAlive) {
+      constructor(x, y, width, height, filePath, isAlive, rotateAngle) {
         super(x, y, width, height, filePath)
         this.isAlive = isAlive
+        this.rotateAngle = rotateAngle
       }
     }
 
@@ -41,6 +42,7 @@
       }
     }
   </script>
+
   <script type="text/javascript">
     var canvas = document.getElementById("flappy-bird")
     var ctx = canvas.getContext("2d")
@@ -52,13 +54,12 @@
     var BIRD_HEIGHT = 50
     var PIPE_WIDTH = 80
     var PIPE_HEIGHT = 178
-    var rotateAngle = 0
     var count = 0
     var countPipe = 0
     var isPrepare = true 
     var background = new Base(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_HEIGHT, 'background.png')
     var ground = loadImage('ground.png')
-    var bird = new Bird(CANVAS_WIDTH / 2 - BIRD_WIDTH, CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2, BIRD_WIDTH, BIRD_HEIGHT, 'bird.png', true)
+    var bird = new Bird(CANVAS_WIDTH / 2 - BIRD_WIDTH, CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2, BIRD_WIDTH, BIRD_HEIGHT, 'bird.png', true, 0)
     var pipes = getPipes()
 
     function startGame() {
@@ -68,7 +69,7 @@
     function updateBirdPosition() {
       if (bird.y >= 5) {
         bird.y -= 80
-        rotateAngle = -20
+        bird.rotateAngle = -20
       }
     }
 
@@ -86,7 +87,7 @@
       this.drawGround()
       this.drawPipes()
       this.ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2)
-      this.ctx.rotate(rotateAngle * Math.PI / 180)
+      this.ctx.rotate(bird.rotateAngle * Math.PI / 180)
       this.ctx.translate(-bird.x - BIRD_WIDTH / 2, -bird.y - BIRD_HEIGHT / 2)
       this.ctx.drawImage(bird.img, bird.x, bird.y, BIRD_WIDTH, BIRD_HEIGHT)
       if (isCollision()) {
@@ -135,7 +136,7 @@
       let p1 = this.pipes.shift()
       let p2 = this.pipes.shift()
       let offset = getRandomInt(20, 120)
-      let isFlip = Math.random() - 0.5 > 0 ? 1 : -1
+      let isFlip = Math.random() > 0.5 ? 1 : -1
       offset *= isFlip
       p1.offset = offset
       p2.offset = -offset
@@ -150,7 +151,7 @@
       let X_OFFSET = CANVAS_WIDTH * 1.5
       for (let i = 0; i < 3; i++) {
         let offset = getRandomInt(20, 120)
-        let isFlip = Math.random() - 0.5 > 0 ? 1 : -1
+        let isFlip = Math.random() > 0.5 ? 1 : -1
         offset *= isFlip
         let p1 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'pipe_flip.png', offset)
         let p2 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'pipe.png', -offset)
@@ -183,9 +184,9 @@
 
     function birdFall() {
       bird.y += 15
-      rotateAngle += 8
-      if (rotateAngle >= 90) {
-        rotateAngle = 90
+      bird.rotateAngle += 8
+      if (bird.rotateAngle >= 90) {
+        bird.rotateAngle = 90
       }
       if (bird.y >= CANVAS_HEIGHT - GROUND_HEIGHT - BIRD_HEIGHT / 2) {
         bird.isAlive = false
