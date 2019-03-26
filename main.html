@@ -2,87 +2,102 @@
   <head>
     <link rel="icon" href="bird.png">
   </head>
-  <body onload="draw();">
-    <canvas id="tutorial" width="480" height="640" style="border: 1px solid black;"></canvas>
+  <body onload="startGame();">
+    <canvas id="flappy-bird" width="480" height="640" style="border: 1px solid black;"></canvas>
   </body>
 
   <script type="text/javascript">
-    class Pipe {
-      constructor(x, y, width, height, offset, isFlip) {
+    function loadImage(filePath) {
+      var img = new Image()
+      img.src = filePath
+      return img
+    }
+
+    function getRandomInt(min, max) {
+      return min + Math.floor(Math.random() * Math.floor(max - min))
+    }
+
+    class Base {
+      constructor(x, y, width, height, filePath) {
         this.x = x
         this.y = y
         this.width = width
-        this.height = height 
-        this.offset = offset
-        this.isFlip = isFlip
-        if (this.isFlip) {
-          this.pipe = loadImage('pipe_flip.png')
-        } else {
-          this.pipe = loadImage('pipe.png')
-        }
+        this.height = height
+        this.img = loadImage(filePath)
       }
     }
-    var canvas = document.getElementById("tutorial")
+
+    class Bird extends Base {
+      constructor(x, y, width, height, filePath, isAlive) {
+        super(x, y, width, height, filePath)
+        this.isAlive = isAlive
+      }
+    }
+
+    class Pipe extends Base {
+      constructor(x, y, width, height, filePath, offset) {
+        super(x, y, width, height, filePath)
+        this.offset = offset  // a random number
+      }
+    }
+  </script>
+  <script type="text/javascript">
+    var canvas = document.getElementById("flappy-bird")
     var ctx = canvas.getContext("2d")
-    var CANVAS_WIDTH = canvas.width 
-    var CANVAS_HEIGHT = canvas.height 
-    var GROUND_WIDTH = 40 
-    var GROUND_HEIGHT = 128 
+    var CANVAS_WIDTH = canvas.width
+    var CANVAS_HEIGHT = canvas.height
+    var GROUND_WIDTH = 40
+    var GROUND_HEIGHT = 128
     var BIRD_WIDTH = 50
     var BIRD_HEIGHT = 50
-    var PIPE_WIDTH = 80 
-    var PIPE_HEIGHT = 178  
-    var x = CANVAS_WIDTH / 2 - BIRD_WIDTH 
-    var y = CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2
-    var rotateAngle = 0 
+    var PIPE_WIDTH = 80
+    var PIPE_HEIGHT = 178
+    var rotateAngle = 0
     var count = 0
     var countPipe = 0
-    var background = loadImage('background.png')
+    var isPrepare = true 
+    var background = new Base(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_HEIGHT, 'background.png')
     var ground = loadImage('ground.png')
-    var bird = loadImage('bird.png')
-    var pipes = getPipes() 
+    var bird = new Bird(CANVAS_WIDTH / 2 - BIRD_WIDTH, CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2, BIRD_WIDTH, BIRD_HEIGHT, 'bird.png', true)
+    var pipes = getPipes()
 
-    function draw() {
+    function startGame() {
       window.addEventListener('keydown', pressKeyHandler, false)
     }
-    
-    function pressUp() {
-      if (y >= 5) {
-        y -= 80 
+
+    function updateBirdPosition() {
+      if (bird.y >= 5) {
+        bird.y -= 80
         rotateAngle = -20
       }
     }
 
     function pressKeyHandler(event) {
-      if (event.keyCode == 32) {
-        pressUp()
+      // press Space key
+      if (bird.isAlive && event.keyCode == 32) {
+        updateBirdPosition()
         reDraw()
       }
     }
-    
+
     function reDraw() {
       this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-      this.ctx.drawImage(background, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_HEIGHT)
+      this.ctx.drawImage(background.img, background.x, background.y, background.width, background.height)
       this.drawGround()
       this.drawPipes()
-      this.ctx.translate(x + BIRD_WIDTH / 2, y + BIRD_HEIGHT / 2)
+      this.ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2)
       this.ctx.rotate(rotateAngle * Math.PI / 180)
-      this.ctx.translate(-x - BIRD_WIDTH / 2, -y - BIRD_HEIGHT / 2)
-      this.ctx.drawImage(bird, x, y, BIRD_WIDTH, BIRD_HEIGHT)
+      this.ctx.translate(-bird.x - BIRD_WIDTH / 2, -bird.y - BIRD_HEIGHT / 2)
+      this.ctx.drawImage(bird.img, bird.x, bird.y, BIRD_WIDTH, BIRD_HEIGHT)
       if (isCollision()) {
-        clearInterval(nIntervId) 
+        bird.isAlive = false 
+        clearInterval(intervId)
       }
       this.ctx.setTransform(1, 0, 0, 1, 0, 0)
-    } 
-
-    function loadImage(filePath) {
-      var img = new Image()
-      img.src = filePath 
-      return img 
     }
 
     function drawGround() {
-      var offset = -count * 10 
+      var offset = -count * 8
       for (let i = 0; i < 15; i++) {
         this.ctx.drawImage(ground, i * GROUND_WIDTH + offset, CANVAS_HEIGHT - GROUND_HEIGHT, GROUND_WIDTH, GROUND_HEIGHT)
       }
@@ -93,45 +108,52 @@
     }
 
     function drawPipes() {
-      var offset = -countPipe * 8 
+      var speed = -6  // pipe moves 6px to left every frame
       for (let i = 0; i < 6; i += 2) {
-        let tx = (1.7 * i) * PIPE_WIDTH + offset
-        pipes[i].x = tx
+        pipes[i].x += speed 
         pipes[i].y = 0
         pipes[i].height = PIPE_HEIGHT - pipes[i].offset
-        pipes[i+1].x = tx
+        pipes[i+1].x += speed
         pipes[i+1].y = CANVAS_HEIGHT - GROUND_HEIGHT - PIPE_HEIGHT + pipes[i+1].offset
         pipes[i+1].height = PIPE_HEIGHT - pipes[i+1].offset
-        this.ctx.drawImage(pipes[i].pipe, pipes[i].x, pipes[i].y, pipes[i].width, pipes[i].height)
-        this.ctx.drawImage(pipes[i+1].pipe, pipes[i+1].x, pipes[i+1].y, pipes[i+1].width, pipes[i+1].height)
+        this.ctx.drawImage(pipes[i].img, pipes[i].x, pipes[i].y, pipes[i].width, pipes[i].height)
+        this.ctx.drawImage(pipes[i+1].img, pipes[i+1].x, pipes[i+1].y, pipes[i+1].width, pipes[i+1].height)
       }
-      countPipe += 1 
-      if (countPipe >= 34) {
+      countPipe += 1
+      if (isPrepare && countPipe >= 165) {
+        isPrepare = false
+        updatePipes()
+        countPipe = 0
+      }
+      if (!isPrepare && countPipe >= 45) {
         updatePipes()
         countPipe = 0
       }
     }
 
     function updatePipes() {
-      this.pipes.shift()
-      this.pipes.shift()
+      let p1 = this.pipes.shift()
+      let p2 = this.pipes.shift()
       let offset = getRandomInt(20, 120)
-      let isFlip = Math.random() - 0.5 > 0 ? 1 : -1 
+      let isFlip = Math.random() - 0.5 > 0 ? 1 : -1
       offset *= isFlip
-      var p1 = new Pipe(0, 0, PIPE_WIDTH, 0, offset, true)  // generate new pipes
-      var p2 = new Pipe(0, 0, PIPE_WIDTH, 0, -offset, false)
+      p1.offset = offset
+      p2.offset = -offset
+      p1.x = this.pipes[2].x + 3.4 * PIPE_WIDTH
+      p2.x = this.pipes[2].x + 3.4 * PIPE_WIDTH 
       this.pipes.push(p1)
       this.pipes.push(p2)
     }
 
     function getPipes() {
-      var pipes = []
+      let pipes = []
+      let X_OFFSET = CANVAS_WIDTH * 1.5
       for (let i = 0; i < 3; i++) {
         let offset = getRandomInt(20, 120)
-        let isFlip = Math.random() - 0.5 > 0 ? 1 : -1 
+        let isFlip = Math.random() - 0.5 > 0 ? 1 : -1
         offset *= isFlip
-        var p1 = new Pipe(0, 0, PIPE_WIDTH, 0, offset, true)
-        var p2 = new Pipe(0, 0, PIPE_WIDTH, 0, -offset, false)
+        let p1 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'pipe_flip.png', offset)
+        let p2 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'pipe.png', -offset)
         pipes.push(p1)
         pipes.push(p2)
       }
@@ -143,39 +165,36 @@
         let dx = pipes[i].x
         let dy = pipes[i].y
         let height = pipes[i].height
-        
-        if (dx < x + BIRD_WIDTH &&
-            dx + PIPE_WIDTH > x &&
-            dy < y + BIRD_HEIGHT &&
-            height + dy > y) {
+
+        if (dx < bird.x + bird.width - 15 &&
+            dx + PIPE_WIDTH > bird.x &&
+            dy < bird.y + BIRD_HEIGHT - 15 &&
+            height + dy > bird.y) {
           return true
         }
       }
-      return false 
+      return false
     }
 
-    function getRandomInt(min, max) {
-      return min + Math.floor(Math.random() * Math.floor(max - min))
-    }
-
-    var nIntervId = null
+    var intervId = null
     function birdFallBegin() {
-      nIntervId = setInterval(birdFall, 100);
+      intervId = setInterval(birdFall, 60);
     }
 
     function birdFall() {
-      y += 20 
-      rotateAngle += 8 
+      bird.y += 15
+      rotateAngle += 8
       if (rotateAngle >= 90) {
         rotateAngle = 90
-      }  
-      if (y >= CANVAS_HEIGHT - GROUND_HEIGHT - BIRD_HEIGHT / 2) {
-        clearInterval(nIntervId)
+      }
+      if (bird.y >= CANVAS_HEIGHT - GROUND_HEIGHT - BIRD_HEIGHT / 2) {
+        bird.isAlive = false
+        clearInterval(intervId)
       } else {
         reDraw()
       }
     }
 
     birdFallBegin()
-  </script>  
+  </script>
 </html>
