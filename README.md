@@ -6,4 +6,4 @@
 - 小鸟与障碍物碰撞检测
 
 #### screenshot
-![alt tag](https://github.com/yibwu/flappy-bird/blob/master/screenshot.jpg)
+![alt tag](https://github.com/yibwu/flappy-bird/blob/master/screenshot.png)
