@@ -63,6 +63,7 @@
     var PIPE_HEIGHT = 178
     var count = 0
     var countPipe = 0
+    var countFall = 0
     var isPrepare = true 
     var background = new Base(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_HEIGHT, 'background.png')
     var ground = loadImage('ground.png')
@@ -75,7 +76,8 @@
 
     function updateBirdPosition() {
       if (bird.y >= 5) {
-        bird.y -= 80
+        countFall = 0
+        bird.y -= 70
         bird.rotateAngle = -20
       }
     }
@@ -186,7 +188,12 @@
     }
 
     function birdFall() {
-      bird.y += 15
+      countFall += 1
+      if (countFall == 1) {
+        bird.y += 15 
+      } else {
+        bird.y += (2 * countFall - 1) // add gravity 
+      }
       bird.rotateAngle += 8
       if (bird.rotateAngle >= 90) {
         bird.rotateAngle = 90
