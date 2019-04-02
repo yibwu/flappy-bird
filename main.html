@@ -65,9 +65,9 @@
     var countPipe = 0
     var countFall = 0
     var isPrepare = true 
-    var background = new Base(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_HEIGHT, 'background.png')
-    var ground = loadImage('ground.png')
-    var bird = new Bird(CANVAS_WIDTH / 2 - BIRD_WIDTH, CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2, BIRD_WIDTH, BIRD_HEIGHT, 'bird.png', true, 0)
+    var background = new Base(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_HEIGHT, 'imgs/background.png')
+    var ground = loadImage('imgs/ground.png')
+    var bird = new Bird(CANVAS_WIDTH / 2 - BIRD_WIDTH, CANVAS_HEIGHT / 2 - BIRD_HEIGHT / 2, BIRD_WIDTH, BIRD_HEIGHT, 'imgs/bird.png', true, 0)
     var pipes = getPipes()
 
     function startGame() {
@@ -158,8 +158,8 @@
       let X_OFFSET = CANVAS_WIDTH * 1.5
       for (let i = 0; i < 3; i++) {
         let offset = getRandomOffset() 
-        let p1 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'pipe_flip.png', offset)
-        let p2 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'pipe.png', -offset)
+        let p1 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'imgs/pipe_flip.png', offset)
+        let p2 = new Pipe(X_OFFSET + 3.4 * i * PIPE_WIDTH, 0, PIPE_WIDTH, 0, 'imgs/pipe.png', -offset)
         pipes.push(p1)
         pipes.push(p2)
       }
